@@ -1,6 +1,6 @@
 {
   "name": "aux-vue-amis-editor",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "支持amis1.9.x 实时编辑预览，在线拖拽开发",
   "main": "src/vue-amis-editor.vue",
   "browser": "src/vue-amis-editor.vue",
