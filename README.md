@@ -1,4 +1,4 @@
-# vue-amis-editor
+# aux-vue-amis-editor
 
 <div align="center">
 

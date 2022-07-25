@@ -1,6 +1,6 @@
 {
   "name": "aux-vue-amis-editor",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "vue-amis-editor ext prop",
   "main": "src/vue-amis-editor.vue",
   "browser": "src/vue-amis-editor.vue",
