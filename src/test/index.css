@@ -1,0 +1,344 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background-color: #f2f2f2;
+}
+.block {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 750rpx;
+  height: 128rpx;
+  background-color: #ffffff;
+}
+.header {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  align-self: center;
+  margin-top: 9rpx;
+}
+.wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+  height: 22rpx;
+  margin-right: 192rpx;
+}
+.logo {
+  width: 94rpx;
+  height: 21rpx;
+  margin-right: 11rpx;
+}
+.media {
+  width: 29rpx;
+  height: 20rpx;
+}
+.largeIcon {
+  width: 67rpx;
+  height: 17rpx;
+  margin-top: 1rpx;
+  margin-right: 184rpx;
+}
+.wrapper1 {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+.logo1 {
+  width: 91rpx;
+  height: 19rpx;
+  margin-top: 3rpx;
+  margin-right: 8rpx;
+}
+.group {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 43rpx;
+  height: 22rpx;
+  margin-right: 3rpx;
+  background-image: url(http://127.0.0.1:7001/public/7c82389f9c874_img_118751_1_0.png);
+  background-size: contain;
+}
+.mask {
+  width: 35rpx;
+  height: 14rpx;
+  background-color: #333333;
+  border-radius: 2rpx;
+}
+.dot {
+  width: 2rpx;
+  height: 7rpx;
+  margin-top: -1rpx;
+}
+.body {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: flex-end;
+  margin-top: 21rpx;
+  margin-right: 15rpx;
+}
+.title {
+  margin-right: 114rpx;
+  font-family: PingFang SC;
+  font-size: 36rpx;
+  font-weight: 500;
+  line-height: 36rpx;
+  color: #333333;
+  text-align: left;
+  white-space: nowrap;
+}
+.wrapper2 {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 64rpx;
+  border-radius: 32rpx;
+  border-width: 1rpx;
+  border-style: solid;
+  border-color: rgba(170, 170, 170, 1);
+}
+.group1 {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 87rpx;
+  margin-top: 0;
+}
+.circle {
+  width: 8rpx;
+  height: 8rpx;
+  margin-top: 1rpx;
+  margin-right: 4rpx;
+  background-color: #333333;
+  border-radius: 4rpx;
+}
+.layer {
+  width: 13rpx;
+  height: 13rpx;
+  margin-right: 4rpx;
+  background-color: #333333;
+  border-radius: 7rpx;
+}
+.circle1 {
+  width: 8rpx;
+  height: 8rpx;
+  margin-top: 1rpx;
+  background-color: #333333;
+  border-radius: 4rpx;
+}
+.verticalLine {
+  width: 1rpx;
+  height: 37rpx;
+  margin-top: -2rpx;
+  margin-right: 1rpx;
+  background-color: #b8b8b8;
+}
+.group2 {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  width: 85rpx;
+  margin-top: -2rpx;
+}
+.view {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 35rpx;
+  height: 35rpx;
+}
+.figure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 35rpx;
+  height: 35rpx;
+}
+.layer1 {
+  position: relative;
+  width: 13rpx;
+  height: 13rpx;
+  background-color: #333333;
+  border-radius: 6.5rpx;
+}
+.block1 {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+.container {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 0;
+  margin-left: 750rpx;
+}
+.horizontalLine {
+  width: 750rpx;
+  height: 1rpx;
+  margin-left: -750rpx;
+  background-color: #eeeeee;
+}
+.block2 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 750rpx;
+  height: 160rpx;
+  background-color: #ffffff;
+  white-space: pre;
+}
+.time {
+  position: relative;
+  overflow: hidden;
+  height: 50rpx;
+  max-width: 738rpx;
+  margin-top: 30rpx;
+  font-family: PingFang SC;
+  font-size: 36rpx;
+  font-weight: 500;
+  line-height: 50rpx;
+  color: #000000;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+.caption {
+  position: relative;
+  overflow: hidden;
+  height: 36rpx;
+  max-width: 738rpx;
+  margin-top: 14rpx;
+  font-family: PingFang SC;
+  font-size: 26rpx;
+  font-weight: 400;
+  line-height: 36rpx;
+  color: #000000;
+  text-align: left;
+  text-overflow: ellipsis;
+}
+.longBannerWrapperItem0 {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20rpx;
+}
+.longBanner {
+  width: 750rpx;
+  height: 1260rpx;
+}
+.longBannerWrapperItem1 {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20rpx;
+}
+.longCover {
+  width: 750rpx;
+  height: 1443rpx;
+}
+.longBannerWrapperItem2 {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20rpx;
+}
+.longBanner1 {
+  width: 750rpx;
+  height: 1917rpx;
+}
+.block3 {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  margin-top: 172rpx;
+}
+.container1 {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 0;
+  margin-left: 750rpx;
+}
+.horizontalLine1 {
+  width: 750rpx;
+  height: 1rpx;
+  margin-left: -750rpx;
+  background-color: #eeeeee;
+}
+.block4 {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 750rpx;
+  height: 100rpx;
+  background-color: #ffffff;
+}
+.body1 {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 424rpx;
+  margin-top: 10rpx;
+}
+.thumbnail {
+  width: 48rpx;
+  height: 48rpx;
+}
+.media1 {
+  width: 48rpx;
+  height: 48rpx;
+}
+.footer {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 416rpx;
+  height: 22rpx;
+  margin-top: 10rpx;
+  line-height: 20rpx;
+  white-space: nowrap;
+}
+.tag {
+  font-family: PingFang SC;
+  font-size: 20rpx;
+  font-weight: 500;
+  color: #178fff;
+  text-align: center;
+}
+.label {
+  font-family: PingFang SC;
+  font-size: 20rpx;
+  font-weight: 400;
+  color: #999999;
+  text-align: center;
+}

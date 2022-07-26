@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Error>
+  <Code>AccessDenied</Code>
+  <Message>You have no right to access this object because of bucket acl.</Message>
+  <RequestId>62DF674C6A91E5383120EB40</RequestId>
+  <HostId>ai-sample.oss-cn-hangzhou.aliyuncs.com</HostId>
+</Error>
