@@ -6,15 +6,15 @@
 import '@fortawesome/fontawesome-free/css/all.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
-import 'amis/lib/helper.css'
- import "amis/lib/themes/cxd.css";
- import "amis/lib/themes/ang.css";
-import "amis/lib/themes/antd.css";
-import "amis/lib/themes/dark.css";
-import "amis/lib/themes/default.css";
-import "amis-editor/dist/style.css";
-import "amis/sdk/sdk.css";
-import { alert, confirm, render as renderSchema, toast } from 'amis'
+import 'aux-rect-amis/lib/helper.css'
+ import "aux-rect-amis/lib/themes/cxd.css";
+ import "aux-rect-amis/lib/themes/ang.css";
+import "aux-rect-amis/lib/themes/antd.css";
+import "aux-rect-amis/lib/themes/dark.css";
+import "aux-rect-amis/lib/themes/default.css";
+import "aux-amis-editor/dist/style.css";
+import "aux-rect-amis/sdk/sdk.css";
+import { alert, confirm, render as renderSchema, toast } from 'aux-rect-amis'
 import copy from 'copy-to-clipboard'
 import ReactDOM from 'react-dom'
 import * as qs from 'qs'

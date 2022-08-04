@@ -22,7 +22,7 @@
             <span slot="checkedChildren">预览</span>
             <span slot="unCheckedChildren">编辑</span>
           </a-switch>
-          <a href="https://aisuda.bce.baidu.com/amis/" target="_blank"> amis文档 </a>
+          <a href="https://aisuda.bce.baidu.com/aux-rect-amis/" target="_blank"> amis文档 </a>
         </div>
     </div>
     <div v-if="isDesignMode">
@@ -41,7 +41,7 @@
       />
     </div>
     <div v-else>
-      <aux-vue-amis-view  :theme="theme"  :schema="schema" :env="env" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
+      <vue-amis-view  :theme="theme"  :schema="schema" :env="env" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
     </div>
   </div>
 </template>
@@ -50,15 +50,15 @@
 import '@fortawesome/fontawesome-free/css/all.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
-import 'amis/lib/helper.css'
- import "amis/lib/themes/cxd.css";
- import "amis/lib/themes/ang.css";
-import "amis/lib/themes/antd.css";
-import "amis/lib/themes/dark.css";
-import "amis/lib/themes/default.css";
-import "amis-editor/dist/style.css";
-import "amis/sdk/sdk.css";
-import { Editor } from "amis-editor";
+import 'aux-rect-amis/lib/helper.css'
+ import "aux-rect-amis/lib/themes/cxd.css";
+ import "aux-rect-amis/lib/themes/ang.css";
+import "aux-rect-amis/lib/themes/antd.css";
+import "aux-rect-amis/lib/themes/dark.css";
+import "aux-rect-amis/lib/themes/default.css";
+import "aux-amis-editor/dist/style.css";
+import "aux-rect-amis/sdk/sdk.css";
+import { Editor } from "aux-amis-editor";
 import { ReactInVue } from "vuera";
 import 'ant-design-vue/dist/antd.css';
 import { Switch} from 'ant-design-vue';
