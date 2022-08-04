@@ -1,0 +1,130 @@
+{
+  "_from": "amis-core@^2.1.0",
+  "_id": "amis-core@2.1.0",
+  "_inBundle": false,
+  "_integrity": "sha512-0gfWvgbVmh1Gj44S/Z7tNA8OFjVdVBod48IWGo5w8JZEY7wo9CUBECoYbClhhZLdnLyvGPm6nKaGYuFGwy1+MA==",
+  "_location": "/amis-core",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "range",
+    "registry": true,
+    "raw": "amis-core@^2.1.0",
+    "name": "amis-core",
+    "escapedName": "amis-core",
+    "rawSpec": "^2.1.0",
+    "saveSpec": null,
+    "fetchSpec": "^2.1.0"
+  },
+  "_requiredBy": [
+    "/",
+    "/amis-ui"
+  ],
+  "_resolved": "https://registry.npmjs.org/amis-core/-/amis-core-2.1.0.tgz",
+  "_shasum": "7782b4d4e512c21a986c8adda62b31a64fb4ab0e",
+  "_spec": "amis-core@^2.1.0",
+  "_where": "D:\\develop\\source\\lowcode\\amis\\vue-amis-editor",
+  "author": {
+    "name": "fex"
+  },
+  "bundleDependencies": false,
+  "dependencies": {
+    "amis-formula": "^2.1.0",
+    "classnames": "2.3.1",
+    "file-saver": "^2.0.2",
+    "hoist-non-react-statics": "^3.3.2",
+    "lodash": "^4.17.15",
+    "match-sorter": "^6.3.1",
+    "mobx": "^4.5.0",
+    "mobx-react": "^6.3.1",
+    "mobx-state-tree": "^3.17.3",
+    "moment": "^2.19.4",
+    "papaparse": "^5.3.0",
+    "qs": "6.9.7",
+    "react-json-view": "1.21.3",
+    "react-visibility-sensor": "5.1.1",
+    "tslib": "^2.3.1",
+    "uncontrollable": "7.2.1"
+  },
+  "deprecated": false,
+  "description": "amis-core",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^22.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-typescript": "^8.3.2",
+    "@testing-library/jest-dom": "^5.16.4",
+    "@types/file-saver": "^2.0.1",
+    "@types/hoist-non-react-statics": "^3.3.1",
+    "@types/jest": "^28.1.0",
+    "@types/react": "^17.0.39",
+    "@types/react-dom": "^17.0.11",
+    "jest": "^28.1.0",
+    "jest-environment-jsdom": "^28.1.0",
+    "moment-timezone": "^0.5.34",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "rimraf": "^3.0.2",
+    "rollup": "^2.73.0",
+    "rollup-plugin-auto-external": "^2.0.0",
+    "rollup-plugin-license": "^2.7.0",
+    "ts-jest": "^28.0.3",
+    "typescript": "^4.6.4"
+  },
+  "files": [
+    "lib",
+    "esm"
+  ],
+  "gitHead": "0c57e9936e83d55b75fb162667e15c84c09fc4ff",
+  "jest": {
+    "testEnvironment": "jsdom",
+    "collectCoverageFrom": [
+      "src/**/*"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "ts-jest"
+    },
+    "setupFiles": [
+      "jest-canvas-mock"
+    ],
+    "testRegex": "/.*\\.test\\.(ts|tsx|js)$",
+    "moduleNameMapper": {
+      "\\.(css|less|sass|scss)$": "<rootDir>/../../__mocks__/styleMock.js",
+      "\\.(svg)$": "<rootDir>/../../__mocks__/svgMock.js"
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/../amis-core/__tests__/jest.setup.js"
+    ],
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/.rollup.cache/"
+    ],
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false
+      }
+    }
+  },
+  "license": "Apache-2.0",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "name": "amis-core",
+  "peerDependencies": {
+    "react": ">=16.8.6",
+    "react-dom": ">=16.8.6"
+  },
+  "scripts": {
+    "build": "npm run clean-dist && NODE_ENV=production rollup -c ",
+    "clean-dist": "rimraf lib/* esm/*",
+    "coverage": "jest --coverage",
+    "dev": "rollup -c -w",
+    "test": "jest",
+    "update-snapshot": "jest --updateSnapshot"
+  },
+  "types": "lib/index.d.ts",
+  "version": "2.1.0"
+}

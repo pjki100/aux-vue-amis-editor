@@ -1,0 +1,892 @@
+/**
+ * amis-core v2.1.0
+ * Copyright 2018-2022 fex
+ */
+
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+var tslib = require('tslib');
+var api = require('../utils/api.js');
+var mobxStateTree = require('mobx-state-tree');
+var helper = require('../utils/helper.js');
+var mobx = require('mobx');
+var Item = require('./Item.js');
+var React = require('react');
+require('amis-formula');
+require('moment');
+var object = require('../utils/object.js');
+var isPureVariable = require('../utils/isPureVariable.js');
+var getVariable = require('../utils/getVariable.js');
+var resolveVariableAndFilter = require('../utils/resolveVariableAndFilter.js');
+var dataMapping = require('../utils/dataMapping.js');
+require('../utils/filter.js');
+var tpl = require('../utils/tpl.js');
+var findIndex = require('lodash/findIndex');
+var isPlainObject = require('lodash/isPlainObject');
+var normalizeOptions = require('../utils/normalizeOptions.js');
+var optionValueCompare = require('../utils/optionValueCompare.js');
+var keyToPath = require('../utils/keyToPath.js');
+
+function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
+
+var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
+var findIndex__default = /*#__PURE__*/_interopDefaultLegacy(findIndex);
+var isPlainObject__default = /*#__PURE__*/_interopDefaultLegacy(isPlainObject);
+
+var detectProps = Item.detectProps.concat([
+    'value',
+    'options',
+    'size',
+    'buttons',
+    'columnsCount',
+    'multiple',
+    'hideRoot',
+    'checkAll',
+    'defaultCheckAll',
+    'showIcon',
+    'showRadio',
+    'btnDisabled',
+    'joinValues',
+    'extractValue',
+    'borderMode',
+    'hideSelected'
+]);
+function registerOptionsControl(config) {
+    var Control = config.component;
+    var FormOptionsItem = /** @class */ (function (_super) {
+        tslib.__extends(FormOptionsItem, _super);
+        function FormOptionsItem(props) {
+            var _this = this;
+            var _a;
+            _this = _super.call(this, props) || this;
+            _this.toDispose = [];
+            _this.mounted = false;
+            var initFetch = props.initFetch, formItem = props.formItem, source = props.source, data = props.data, setPrinstineValue = props.setPrinstineValue, defaultValue = props.defaultValue, multiple = props.multiple, joinValues = props.joinValues, extractValue = props.extractValue, addHook = props.addHook, formInited = props.formInited, valueField = props.valueField, options = props.options, value = props.value, defaultCheckAll = props.defaultCheckAll;
+            if (formItem) {
+                formItem.setOptions(normalizeOptions.normalizeOptions(options, undefined, valueField), _this.changeOptionValue, data);
+                _this.toDispose.push(mobx.reaction(function () { return JSON.stringify([formItem.loading, formItem.filteredOptions]); }, function () { return _this.mounted && _this.forceUpdate(); }));
+                _this.toDispose.push(mobx.reaction(function () {
+                    return JSON.stringify(formItem.getSelectedOptions(formItem.tmpValue));
+                }, function () {
+                    return _this.mounted &&
+                        _this.syncAutoFill(formItem.getSelectedOptions(formItem.tmpValue));
+                }));
+                // 默认全选。这里会和默认值\回填值逻辑冲突，所以如果有配置source则不执行默认全选
+                if (multiple &&
+                    defaultCheckAll &&
+                    ((_a = formItem.filteredOptions) === null || _a === void 0 ? void 0 : _a.length) &&
+                    !source) {
+                    _this.defaultCheckAll();
+                }
+            }
+            var loadOptions = initFetch !== false;
+            if (formItem && joinValues === false && defaultValue) {
+                var selectedOptions = extractValue
+                    ? formItem
+                        .getSelectedOptions(value)
+                        .map(function (selectedOption) {
+                        return selectedOption[valueField || 'value'];
+                    })
+                    : formItem.getSelectedOptions(value);
+                setPrinstineValue(multiple ? selectedOptions.concat() : selectedOptions[0]);
+            }
+            loadOptions &&
+                config.autoLoadOptionsFromSource !== false &&
+                (formInited || !addHook
+                    ? _this.reload()
+                    : addHook && addHook(_this.initOptions, 'init'));
+            return _this;
+        }
+        FormOptionsItem.prototype.componentDidMount = function () {
+            this.mounted = true;
+            this.normalizeValue();
+        };
+        FormOptionsItem.prototype.shouldComponentUpdate = function (nextProps) {
+            var _a;
+            if (config.strictMode === false || nextProps.strictMode === false) {
+                return true;
+            }
+            else if (nextProps.source || nextProps.autoComplete) {
+                return true;
+            }
+            else if ((_a = nextProps.formItem) === null || _a === void 0 ? void 0 : _a.expressionsInOptions) {
+                return true;
+            }
+            if (helper.anyChanged(detectProps, this.props, nextProps)) {
+                return true;
+            }
+            return false;
+        };
+        FormOptionsItem.prototype.componentDidUpdate = function (prevProps) {
+            var _this = this;
+            var props = this.props;
+            var formItem = props.formItem;
+            if (prevProps.options !== props.options && formItem) {
+                formItem.setOptions(normalizeOptions.normalizeOptions(props.options || [], undefined, props.valueField), this.changeOptionValue, props.data);
+                this.normalizeValue();
+            }
+            else if (config.autoLoadOptionsFromSource !== false &&
+                (props.formInited || typeof props.formInited === 'undefined') &&
+                props.source &&
+                formItem &&
+                (prevProps.source !== props.source || prevProps.data !== props.data)) {
+                if (isPureVariable.isPureVariable(props.source)) {
+                    var prevOptions = resolveVariableAndFilter.resolveVariableAndFilter(prevProps.source, prevProps.data, '| raw');
+                    var options = resolveVariableAndFilter.resolveVariableAndFilter(props.source, props.data, '| raw');
+                    if (prevOptions !== options) {
+                        formItem.setOptions(normalizeOptions.normalizeOptions(options || [], undefined, props.valueField || 'value'), this.changeOptionValue, props.data);
+                        this.normalizeValue();
+                    }
+                }
+                else if (api.isEffectiveApi(props.source, props.data) &&
+                    api.isApiOutdated(prevProps.source, props.source, prevProps.data, props.data)) {
+                    formItem
+                        .loadOptions(props.source, props.data, undefined, true, this.changeOptionValue)
+                        .then(function () { return _this.normalizeValue(); });
+                }
+            }
+            if (prevProps.value !== props.value || (formItem === null || formItem === void 0 ? void 0 : formItem.expressionsInOptions)) {
+                formItem === null || formItem === void 0 ? void 0 : formItem.syncOptions(undefined, props.data);
+            }
+        };
+        FormOptionsItem.prototype.componentWillUnmount = function () {
+            var _a, _b;
+            (_b = (_a = this.props).removeHook) === null || _b === void 0 ? void 0 : _b.call(_a, this.reload, 'init');
+            this.toDispose.forEach(function (fn) { return fn(); });
+            this.toDispose = [];
+        };
+        FormOptionsItem.prototype.dispatchOptionEvent = function (eventName, eventData) {
+            if (eventData === void 0) { eventData = ''; }
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _a, dispatchEvent, options, data, rendererEvent;
+                return tslib.__generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _a = this.props, dispatchEvent = _a.dispatchEvent, options = _a.options, data = _a.data;
+                            return [4 /*yield*/, dispatchEvent(eventName, object.createObject(data, {
+                                    value: eventData,
+                                    options: options
+                                }))];
+                        case 1:
+                            rendererEvent = _b.sent();
+                            // 返回阻塞标识
+                            return [2 /*return*/, !!(rendererEvent === null || rendererEvent === void 0 ? void 0 : rendererEvent.prevented)];
+                    }
+                });
+            });
+        };
+        FormOptionsItem.prototype.doAction = function (action, data, throwErrors) {
+            var _a = this.props, resetValue = _a.resetValue, onChange = _a.onChange;
+            var actionType = action === null || action === void 0 ? void 0 : action.actionType;
+            if (actionType === 'clear') {
+                onChange === null || onChange === void 0 ? void 0 : onChange('');
+            }
+            else if (actionType === 'reset') {
+                onChange === null || onChange === void 0 ? void 0 : onChange(resetValue !== null && resetValue !== void 0 ? resetValue : '');
+            }
+        };
+        FormOptionsItem.prototype.syncAutoFill = function (selectedOptions) {
+            var _a = this.props, autoFill = _a.autoFill, multiple = _a.multiple, onBulkChange = _a.onBulkChange, data = _a.data;
+            var formItem = this.props.formItem;
+            // 参照录入｜自动填充
+            if (autoFill === null || autoFill === void 0 ? void 0 : autoFill.hasOwnProperty('api')) {
+                return;
+            }
+            if (onBulkChange &&
+                autoFill &&
+                !helper.isEmpty(autoFill) &&
+                formItem.filteredOptions.length) {
+                var toSync_1 = dataMapping.dataMapping(autoFill, multiple
+                    ? {
+                        items: selectedOptions.map(function (item) {
+                            return object.createObject(tslib.__assign(tslib.__assign({}, data), { ancestors: helper.getTreeAncestors(formItem.filteredOptions, item, true) }), item);
+                        })
+                    }
+                    : object.createObject(tslib.__assign(tslib.__assign({}, data), { ancestors: helper.getTreeAncestors(formItem.filteredOptions, selectedOptions[0], true) }), selectedOptions[0]));
+                Object.keys(autoFill).forEach(function (key) {
+                    var keys = keyToPath.keyToPath(key);
+                    // 如果左边的 key 是一个路径
+                    // 这里不希望直接把原始对象都给覆盖没了
+                    // 而是保留原始的对象，只修改指定的属性
+                    if (keys.length > 1 && isPlainObject__default["default"](data[keys[0]])) {
+                        var obj = tslib.__assign({}, data[keys[0]]);
+                        var value = getVariable.getVariable(toSync_1, key);
+                        toSync_1[keys[0]] = obj;
+                        object.setVariable(toSync_1, key, value);
+                    }
+                });
+                onBulkChange(toSync_1);
+            }
+        };
+        // 当前值，跟设置预期的值格式不一致时自动转换。
+        FormOptionsItem.prototype.normalizeValue = function () {
+            var _a = this.props, joinValues = _a.joinValues, extractValue = _a.extractValue, value = _a.value, multiple = _a.multiple, formItem = _a.formItem, valueField = _a.valueField; _a.enableNodePath; _a.pathSeparator; var onChange = _a.onChange;
+            if (!formItem || joinValues !== false || !formItem.options.length) {
+                return;
+            }
+            if (extractValue === false &&
+                (typeof value === 'string' || typeof value === 'number')) {
+                var selectedOptions = formItem.getSelectedOptions(value);
+                onChange === null || onChange === void 0 ? void 0 : onChange(multiple ? selectedOptions.concat() : selectedOptions[0]);
+            }
+            else if (extractValue === true &&
+                value &&
+                !((Array.isArray(value) &&
+                    value.every(function (val) { return typeof val === 'string' || typeof val === 'number'; })) ||
+                    typeof value === 'string' ||
+                    typeof value === 'number')) {
+                var selectedOptions = formItem
+                    .getSelectedOptions(value)
+                    .map(function (selectedOption) { return selectedOption[valueField || 'value']; });
+                onChange === null || onChange === void 0 ? void 0 : onChange(multiple ? selectedOptions.concat() : selectedOptions[0]);
+            }
+        };
+        FormOptionsItem.prototype.getWrappedInstance = function () {
+            return this.input;
+        };
+        FormOptionsItem.prototype.inputRef = function (ref) {
+            this.input = ref;
+        };
+        FormOptionsItem.prototype.handleToggle = function (option, submitOnChange, changeImmediately) {
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _a, onChange, formItem, value, newValue, isPrevented;
+                return tslib.__generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _a = this.props, onChange = _a.onChange, formItem = _a.formItem, value = _a.value;
+                            if (!formItem) {
+                                return [2 /*return*/];
+                            }
+                            newValue = this.toggleValue(option, value);
+                            return [4 /*yield*/, this.dispatchOptionEvent('change', newValue)];
+                        case 1:
+                            isPrevented = _b.sent();
+                            isPrevented ||
+                                (onChange && onChange(newValue, submitOnChange, changeImmediately));
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        /**
+         * 初始化时处理默认全选逻辑
+         */
+        FormOptionsItem.prototype.defaultCheckAll = function () {
+            var _a = this.props, value = _a.value, formItem = _a.formItem, setPrinstineValue = _a.setPrinstineValue;
+            // 如果有默认值\回填值直接返回
+            if (!formItem || formItem.getSelectedOptions(value).length) {
+                return;
+            }
+            var valueArray = formItem.filteredOptions.concat();
+            var newValue = this.formatValueArray(valueArray);
+            setPrinstineValue === null || setPrinstineValue === void 0 ? void 0 : setPrinstineValue(newValue);
+        };
+        /**
+         * 选中的值经过joinValues和delimiter等规则处理输出规定格式的值
+         * @param valueArray 选中值的数组
+         * @returns 通过joinValues和delimiter等规则输出规定格式的值
+         */
+        FormOptionsItem.prototype.formatValueArray = function (valueArray) {
+            var _a = this.props, joinValues = _a.joinValues, extractValue = _a.extractValue, valueField = _a.valueField, delimiter = _a.delimiter, resetValue = _a.resetValue, multiple = _a.multiple;
+            var newValue = '';
+            if (multiple) {
+                /** 兼容tree数据结构 */
+                newValue =
+                    helper.getTreeDepth(valueArray) > 1 ? helper.flattenTree(valueArray) : valueArray;
+                if (joinValues) {
+                    newValue = newValue
+                        .map(function (item) { return item[valueField || 'value']; })
+                        .filter(function (item) { return item != null; }) /** tree的父节点可能没有value值 */
+                        .join(delimiter);
+                }
+                else if (extractValue) {
+                    newValue = newValue
+                        .map(function (item) { return item[valueField || 'value']; })
+                        .filter(function (item) { return item != null; });
+                }
+            }
+            else {
+                newValue = valueArray[0] || resetValue;
+                if (joinValues && newValue) {
+                    newValue = newValue[valueField || 'value'];
+                }
+            }
+            return newValue;
+        };
+        FormOptionsItem.prototype.handleToggleAll = function () {
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _a, value, onChange, formItem, valueField, selectedOptions, filteredOptions, valueArray, newValue, isPrevented;
+                return tslib.__generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _a = this.props, value = _a.value, onChange = _a.onChange, formItem = _a.formItem, valueField = _a.valueField;
+                            if (!formItem) {
+                                return [2 /*return*/];
+                            }
+                            selectedOptions = formItem.getSelectedOptions(value);
+                            filteredOptions = helper.flattenTree(formItem.filteredOptions.concat()).filter(function (item) { return item != null && item[valueField || 'value'] != null; });
+                            valueArray = selectedOptions.length === filteredOptions.length
+                                ? []
+                                : formItem.filteredOptions.concat();
+                            newValue = this.formatValueArray(valueArray);
+                            return [4 /*yield*/, this.dispatchOptionEvent('change', newValue)];
+                        case 1:
+                            isPrevented = _b.sent();
+                            isPrevented || (onChange && onChange(newValue));
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        FormOptionsItem.prototype.toggleValue = function (option, originValue) {
+            var _a = this.props, joinValues = _a.joinValues, extractValue = _a.extractValue, valueField = _a.valueField, delimiter = _a.delimiter, clearable = _a.clearable, resetValue = _a.resetValue, multiple = _a.multiple, formItem = _a.formItem;
+            var valueArray = originValue !== undefined
+                ? formItem.getSelectedOptions(originValue).concat()
+                : [];
+            var idx = findIndex__default["default"](valueArray, optionValueCompare.optionValueCompare(option[valueField || 'value'], valueField || 'value'));
+            var newValue = '';
+            if (multiple) {
+                if (~idx) {
+                    valueArray.splice(idx, 1);
+                }
+                else {
+                    valueArray.push(option);
+                }
+                newValue = valueArray;
+                if (joinValues) {
+                    newValue = newValue
+                        .map(function (item) { return item[valueField || 'value']; })
+                        .join(delimiter);
+                }
+                else if (extractValue) {
+                    newValue = newValue.map(function (item) { return item[valueField || 'value']; });
+                }
+            }
+            else {
+                if (~idx && clearable) {
+                    valueArray.splice(idx, 1);
+                }
+                else {
+                    valueArray = [option];
+                }
+                newValue = valueArray[0] || resetValue;
+                if ((joinValues || extractValue) && newValue) {
+                    newValue = newValue[valueField || 'value'];
+                }
+            }
+            return newValue;
+        };
+        // 当有 action 触发，如果指定了 reload 目标组件，有可能会来到这里面来
+        FormOptionsItem.prototype.reload = function () {
+            return this.reloadOptions();
+        };
+        FormOptionsItem.prototype.reloadOptions = function (setError, isInit) {
+            if (isInit === void 0) { isInit = false; }
+            var _a = this.props, source = _a.source, formItem = _a.formItem, data = _a.data, onChange = _a.onChange, setPrinstineValue = _a.setPrinstineValue, valueField = _a.valueField;
+            if (formItem && isPureVariable.isPureVariable(source)) {
+                mobxStateTree.isAlive(formItem) &&
+                    formItem.setOptions(normalizeOptions.normalizeOptions(resolveVariableAndFilter.resolveVariableAndFilter(source, data, '| raw') || [], undefined, valueField), this.changeOptionValue, data);
+                return;
+            }
+            else if (!formItem || !api.isEffectiveApi(source, data)) {
+                return;
+            }
+            return formItem.loadOptions(source, data, undefined, false, isInit ? setPrinstineValue : onChange, setError);
+        };
+        FormOptionsItem.prototype.deferLoad = function (option) {
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _a, deferApi, source, env, formItem, data, api, json;
+                return tslib.__generator(this, function (_b) {
+                    switch (_b.label) {
+                        case 0:
+                            _a = this.props, deferApi = _a.deferApi, source = _a.source, env = _a.env, formItem = _a.formItem, data = _a.data;
+                            api = option.deferApi || deferApi || source;
+                            if (!api) {
+                                env.notify('error', '请在选项中设置 `deferApi` 或者表单项中设置 `deferApi`，用来加载子选项。');
+                                return [2 /*return*/];
+                            }
+                            return [4 /*yield*/, (formItem === null || formItem === void 0 ? void 0 : formItem.deferLoadOptions(option, api, object.createObject(data, option)))];
+                        case 1:
+                            json = _b.sent();
+                            // 触发事件通知,加载完成
+                            this.dispatchOptionEvent('loadFinished', json);
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        FormOptionsItem.prototype.leftDeferLoad = function (option, leftOptions) {
+            var _a = this.props, deferApi = _a.deferApi, source = _a.source, env = _a.env, formItem = _a.formItem, data = _a.data;
+            var api = option.deferApi || deferApi || source;
+            if (!api) {
+                env.notify('error', '请在选项中设置 `deferApi` 或者表单项中设置 `deferApi`，用来加载子选项。');
+                return;
+            }
+            formItem === null || formItem === void 0 ? void 0 : formItem.deferLoadLeftOptions(option, leftOptions, api, object.createObject(data, option));
+        };
+        FormOptionsItem.prototype.expandTreeOptions = function (nodePathArr) {
+            var _a = this.props, deferApi = _a.deferApi, source = _a.source, env = _a.env, formItem = _a.formItem, data = _a.data;
+            var api = deferApi || source;
+            if (!api) {
+                env.notify('error', '请在选项中设置 `deferApi` 或者表单项中设置 `deferApi`，用来加载子选项。');
+                return;
+            }
+            formItem === null || formItem === void 0 ? void 0 : formItem.expandTreeOptions(nodePathArr, api, object.createObject(data));
+        };
+        FormOptionsItem.prototype.initOptions = function (data) {
+            var _a;
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _b, formItem, name, multiple, defaultCheckAll;
+                return tslib.__generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0: return [4 /*yield*/, this.reloadOptions(false, true)];
+                        case 1:
+                            _c.sent();
+                            _b = this.props, formItem = _b.formItem, name = _b.name, multiple = _b.multiple, defaultCheckAll = _b.defaultCheckAll;
+                            if (!formItem) {
+                                return [2 /*return*/];
+                            }
+                            if (mobxStateTree.isAlive(formItem) && formItem.value) {
+                                object.setVariable(data, name, formItem.value);
+                            }
+                            // 默认全选
+                            if (multiple && defaultCheckAll && ((_a = formItem.filteredOptions) === null || _a === void 0 ? void 0 : _a.length)) {
+                                this.defaultCheckAll();
+                            }
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        FormOptionsItem.prototype.focus = function () {
+            this.input && this.input.focus && this.input.focus();
+        };
+        FormOptionsItem.prototype.changeOptionValue = function (value) {
+            var _a = this.props, onChange = _a.onChange, formInited = _a.formInited, setPrinstineValue = _a.setPrinstineValue, originValue = _a.value;
+            if (formInited === false) {
+                originValue === undefined && (setPrinstineValue === null || setPrinstineValue === void 0 ? void 0 : setPrinstineValue(value));
+            }
+            else {
+                onChange === null || onChange === void 0 ? void 0 : onChange(value);
+            }
+        };
+        FormOptionsItem.prototype.setOptions = function (options, skipNormalize) {
+            if (skipNormalize === void 0) { skipNormalize = false; }
+            var formItem = this.props.formItem;
+            formItem &&
+                formItem.setOptions(skipNormalize
+                    ? options
+                    : normalizeOptions.normalizeOptions(options || [], undefined, this.props.valueField), this.changeOptionValue, this.props.data);
+        };
+        FormOptionsItem.prototype.syncOptions = function () {
+            var formItem = this.props.formItem;
+            formItem && formItem.syncOptions(undefined, this.props.data);
+        };
+        FormOptionsItem.prototype.setLoading = function (value) {
+            var formItem = this.props.formItem;
+            formItem && formItem.setLoading(value);
+        };
+        FormOptionsItem.prototype.handleOptionAdd = function (idx, value, skipForm) {
+            if (idx === void 0) { idx = -1; }
+            if (skipForm === void 0) { skipForm = false; }
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _a, addControls, disabled, labelField, onOpenDialog, optionLabel, addApi, source, data, valueField, model, createBtnLabel, env, __, parent, ctx, result, _b, payload, e_1, isPrevented, options;
+                var _c;
+                return tslib.__generator(this, function (_d) {
+                    switch (_d.label) {
+                        case 0:
+                            _a = this.props, addControls = _a.addControls, disabled = _a.disabled, labelField = _a.labelField, onOpenDialog = _a.onOpenDialog, optionLabel = _a.optionLabel, addApi = _a.addApi, source = _a.source, data = _a.data, valueField = _a.valueField, model = _a.formItem, createBtnLabel = _a.createBtnLabel, env = _a.env, __ = _a.translate;
+                            // 禁用或者没有配置 name
+                            if (disabled || !model) {
+                                return [2 /*return*/];
+                            }
+                            // 用户没有配置表单项，则自动创建一个 label 输入
+                            if (!skipForm && (!Array.isArray(addControls) || !addControls.length)) {
+                                addControls = [
+                                    {
+                                        type: 'text',
+                                        name: labelField || 'label',
+                                        label: false,
+                                        required: true,
+                                        placeholder: __('Options.addPlaceholder')
+                                    }
+                                ];
+                            }
+                            parent = Array.isArray(idx)
+                                ? helper.getTree(model.options, idx.slice(0, -1))
+                                : undefined;
+                            ctx = object.createObject(data, Array.isArray(idx)
+                                ? tslib.__assign({ parent: parent }, value) : value);
+                            if (!skipForm) return [3 /*break*/, 1];
+                            _b = ctx;
+                            return [3 /*break*/, 3];
+                        case 1: return [4 /*yield*/, onOpenDialog({
+                                type: 'dialog',
+                                title: createBtnLabel || "\u65B0\u589E".concat(optionLabel || '选项'),
+                                body: {
+                                    type: 'form',
+                                    api: addApi,
+                                    controls: tslib.__spreadArray([
+                                        {
+                                            type: 'hidden',
+                                            name: 'idx',
+                                            value: idx
+                                        },
+                                        {
+                                            type: 'hidden',
+                                            name: 'parent',
+                                            value: parent
+                                        }
+                                    ], (addControls || []), true)
+                                }
+                            }, ctx)];
+                        case 2:
+                            _b = _d.sent();
+                            _d.label = 3;
+                        case 3:
+                            result = _b;
+                            if (!(skipForm && addApi)) return [3 /*break*/, 7];
+                            _d.label = 4;
+                        case 4:
+                            _d.trys.push([4, 6, , 7]);
+                            return [4 /*yield*/, env.fetcher(addApi, result, {
+                                    method: 'post'
+                                })];
+                        case 5:
+                            payload = _d.sent();
+                            if (!payload.ok) {
+                                env.notify('error', payload.msg || __('Options.createFailed'));
+                                result = null;
+                            }
+                            else {
+                                result = payload.data || result;
+                            }
+                            return [3 /*break*/, 7];
+                        case 6:
+                            e_1 = _d.sent();
+                            result = null;
+                            console.error(e_1);
+                            env.notify('error', e_1.message);
+                            return [3 /*break*/, 7];
+                        case 7:
+                            // 有 result 说明弹框点了确认。否则就是取消了。
+                            if (!result) {
+                                return [2 /*return*/];
+                            }
+                            // 没走服务端的。
+                            if (!result.hasOwnProperty(valueField || 'value')) {
+                                result = tslib.__assign(tslib.__assign({}, result), (_c = {}, _c[valueField || 'value'] = result[labelField || 'label'], _c));
+                            }
+                            return [4 /*yield*/, this.dispatchOptionEvent('add', tslib.__assign(tslib.__assign({}, result), { idx: idx }))];
+                        case 8:
+                            isPrevented = _d.sent();
+                            if (isPrevented) {
+                                return [2 /*return*/];
+                            }
+                            if (!(parent === null || parent === void 0 ? void 0 : parent.defer)) return [3 /*break*/, 10];
+                            return [4 /*yield*/, this.deferLoad(parent)];
+                        case 9:
+                            _d.sent();
+                            return [3 /*break*/, 11];
+                        case 10:
+                            if (source && addApi) {
+                                // 如果配置了 source 且配置了 addApi 直接重新拉取接口就够了
+                                // 不能不判断 addApi 就刷新，因为有些场景就是临时添加的。
+                                this.reload();
+                            }
+                            else {
+                                options = model.options.concat();
+                                if (Array.isArray(idx)) {
+                                    options = helper.spliceTree(options, idx, 0, tslib.__assign({}, result));
+                                }
+                                else {
+                                    ~idx
+                                        ? options.splice(idx, 0, tslib.__assign({}, result))
+                                        : options.push(tslib.__assign({}, result));
+                                }
+                                model.setOptions(options, this.changeOptionValue, data);
+                            }
+                            _d.label = 11;
+                        case 11: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        FormOptionsItem.prototype.handleOptionEdit = function (value, origin, skipForm) {
+            if (origin === void 0) { origin = value; }
+            if (skipForm === void 0) { skipForm = false; }
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _a, editControls, disabled, labelField, onOpenDialog, editApi, env, source, data, model, optionLabel, __, result, _b, payload, e_2, isPrevented, indexes;
+                return tslib.__generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0:
+                            _a = this.props, editControls = _a.editControls, disabled = _a.disabled, labelField = _a.labelField, onOpenDialog = _a.onOpenDialog, editApi = _a.editApi, env = _a.env, source = _a.source, data = _a.data, model = _a.formItem, optionLabel = _a.optionLabel, __ = _a.translate;
+                            if (disabled || !model) {
+                                return [2 /*return*/];
+                            }
+                            if (!skipForm && (!Array.isArray(editControls) || !editControls.length)) {
+                                editControls = [
+                                    {
+                                        type: 'text',
+                                        name: labelField || 'label',
+                                        label: false,
+                                        placeholder: __('Options.addPlaceholder')
+                                    }
+                                ];
+                            }
+                            if (!skipForm) return [3 /*break*/, 1];
+                            _b = value;
+                            return [3 /*break*/, 3];
+                        case 1: return [4 /*yield*/, onOpenDialog({
+                                type: 'dialog',
+                                title: __('Options.editLabel', {
+                                    label: optionLabel || __('Options.label')
+                                }),
+                                body: {
+                                    type: 'form',
+                                    api: editApi,
+                                    controls: editControls
+                                }
+                            }, object.createObject(data, value))];
+                        case 2:
+                            _b = _c.sent();
+                            _c.label = 3;
+                        case 3:
+                            result = _b;
+                            if (!(skipForm && editApi)) return [3 /*break*/, 7];
+                            _c.label = 4;
+                        case 4:
+                            _c.trys.push([4, 6, , 7]);
+                            return [4 /*yield*/, env.fetcher(editApi, object.createObject(data, result), {
+                                    method: 'post'
+                                })];
+                        case 5:
+                            payload = _c.sent();
+                            if (!payload.ok) {
+                                env.notify('error', payload.msg || __('saveFailed'));
+                                result = null;
+                            }
+                            else {
+                                result = payload.data || result;
+                            }
+                            return [3 /*break*/, 7];
+                        case 6:
+                            e_2 = _c.sent();
+                            result = null;
+                            console.error(e_2);
+                            env.notify('error', e_2.message);
+                            return [3 /*break*/, 7];
+                        case 7:
+                            // 没有结果，说明取消了。
+                            if (!result) {
+                                return [2 /*return*/];
+                            }
+                            return [4 /*yield*/, this.dispatchOptionEvent('edit', result)];
+                        case 8:
+                            isPrevented = _c.sent();
+                            if (isPrevented) {
+                                return [2 /*return*/];
+                            }
+                            if (source && editApi) {
+                                this.reload();
+                            }
+                            else {
+                                indexes = helper.findTreeIndex(model.options, function (item) { return item === origin; });
+                                if (indexes) {
+                                    model.setOptions(helper.spliceTree(model.options, indexes, 1, tslib.__assign(tslib.__assign({}, origin), result)), this.changeOptionValue, data);
+                                }
+                            }
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        FormOptionsItem.prototype.handleOptionDelete = function (value) {
+            return tslib.__awaiter(this, void 0, void 0, function () {
+                var _a, deleteConfirmText, disabled, data, deleteApi, env, model, source, valueField, __, ctx, confirmed, _b, isPrevented, result, options, indexes, e_3;
+                return tslib.__generator(this, function (_c) {
+                    switch (_c.label) {
+                        case 0:
+                            _a = this.props, deleteConfirmText = _a.deleteConfirmText, disabled = _a.disabled, data = _a.data, deleteApi = _a.deleteApi, env = _a.env, model = _a.formItem, source = _a.source, valueField = _a.valueField, __ = _a.translate;
+                            if (disabled || !model) {
+                                return [2 /*return*/];
+                            }
+                            ctx = object.createObject(data, value);
+                            if (!deleteConfirmText) return [3 /*break*/, 2];
+                            return [4 /*yield*/, env.confirm(tpl.filter(__(deleteConfirmText), ctx))];
+                        case 1:
+                            _b = _c.sent();
+                            return [3 /*break*/, 3];
+                        case 2:
+                            _b = true;
+                            _c.label = 3;
+                        case 3:
+                            confirmed = _b;
+                            if (!confirmed) {
+                                return [2 /*return*/];
+                            }
+                            return [4 /*yield*/, this.dispatchOptionEvent('delete', ctx)];
+                        case 4:
+                            isPrevented = _c.sent();
+                            if (isPrevented) {
+                                return [2 /*return*/];
+                            }
+                            _c.label = 5;
+                        case 5:
+                            _c.trys.push([5, 7, , 8]);
+                            if (!deleteApi) {
+                                throw new Error(__('Options.deleteAPI'));
+                            }
+                            return [4 /*yield*/, env.fetcher(deleteApi, ctx, {
+                                    method: 'delete'
+                                })];
+                        case 6:
+                            result = _c.sent();
+                            if (!result.ok) {
+                                env.notify('error', result.msg || __('deleteFailed'));
+                            }
+                            else if (source) {
+                                this.reload();
+                            }
+                            else {
+                                options = model.options.concat();
+                                indexes = helper.findTreeIndex(options, function (item) { return item[valueField || 'value'] == value[valueField || 'value']; });
+                                if (indexes) {
+                                    model.setOptions(helper.spliceTree(options, indexes, 1), this.changeOptionValue, data);
+                                }
+                            }
+                            return [3 /*break*/, 8];
+                        case 7:
+                            e_3 = _c.sent();
+                            console.error(e_3);
+                            env.notify('error', e_3.message);
+                            return [3 /*break*/, 8];
+                        case 8: return [2 /*return*/];
+                    }
+                });
+            });
+        };
+        FormOptionsItem.prototype.render = function () {
+            var _a = this.props, value = _a.value, formItem = _a.formItem, addApi = _a.addApi, editApi = _a.editApi, deleteApi = _a.deleteApi, creatable = _a.creatable, editable = _a.editable, removable = _a.removable, enableNodePath = _a.enableNodePath, pathSeparator = _a.pathSeparator, _b = _a.delimiter, delimiter = _b === void 0 ? ',' : _b, _c = _a.labelField, labelField = _c === void 0 ? 'label' : _c, _d = _a.valueField, valueField = _d === void 0 ? 'value' : _d;
+            var _e = helper.normalizeNodePath(value, enableNodePath, labelField, valueField, pathSeparator, delimiter), nodePathArray = _e.nodePathArray, nodeValueArray = _e.nodeValueArray;
+            return (React__default["default"].createElement(Control, tslib.__assign({}, this.props, { ref: this.inputRef, options: formItem ? formItem.filteredOptions : [], onToggle: this.handleToggle, onToggleAll: this.handleToggleAll, selectedOptions: formItem
+                    ? formItem.getSelectedOptions(value, enableNodePath ? nodeValueArray : undefined)
+                    : [], nodePath: nodePathArray, loading: formItem ? formItem.loading : false, setLoading: this.setLoading, setOptions: this.setOptions, syncOptions: this.syncOptions, reloadOptions: this.reload, deferLoad: this.deferLoad, leftDeferLoad: this.leftDeferLoad, expandTreeOptions: this.expandTreeOptions, creatable: creatable !== false && api.isEffectiveApi(addApi) ? true : creatable, editable: editable || (editable !== false && api.isEffectiveApi(editApi)), removable: removable || (removable !== false && api.isEffectiveApi(deleteApi)), onAdd: this.handleOptionAdd, onEdit: this.handleOptionEdit, onDelete: this.handleOptionDelete })));
+        };
+        FormOptionsItem.displayName = "OptionsControl(".concat(config.type, ")");
+        FormOptionsItem.defaultProps = tslib.__assign({ delimiter: ',', labelField: 'label', valueField: 'value', joinValues: true, extractValue: false, multiple: false, placeholder: 'Select.placeholder', resetValue: '', deleteConfirmText: 'deleteConfirm' }, Control.defaultProps);
+        FormOptionsItem.propsList = Control.propsList
+            ? tslib.__spreadArray([], Control.propsList, true) : [];
+        FormOptionsItem.ComposedComponent = Control;
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object]),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "inputRef", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object, Boolean, Boolean]),
+            tslib.__metadata("design:returntype", Promise)
+        ], FormOptionsItem.prototype, "handleToggle", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", []),
+            tslib.__metadata("design:returntype", Promise)
+        ], FormOptionsItem.prototype, "handleToggleAll", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", []),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "reload", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Boolean, Object]),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "reloadOptions", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object]),
+            tslib.__metadata("design:returntype", Promise)
+        ], FormOptionsItem.prototype, "deferLoad", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object, Object]),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "leftDeferLoad", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Array]),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "expandTreeOptions", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object]),
+            tslib.__metadata("design:returntype", Promise)
+        ], FormOptionsItem.prototype, "initOptions", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object]),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "changeOptionValue", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Array, Object]),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "setOptions", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", []),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "syncOptions", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Boolean]),
+            tslib.__metadata("design:returntype", void 0)
+        ], FormOptionsItem.prototype, "setLoading", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object, Object, Boolean]),
+            tslib.__metadata("design:returntype", Promise)
+        ], FormOptionsItem.prototype, "handleOptionAdd", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object, Object, Boolean]),
+            tslib.__metadata("design:returntype", Promise)
+        ], FormOptionsItem.prototype, "handleOptionEdit", null);
+        tslib.__decorate([
+            helper.autobind,
+            tslib.__metadata("design:type", Function),
+            tslib.__metadata("design:paramtypes", [Object]),
+            tslib.__metadata("design:returntype", Promise)
+        ], FormOptionsItem.prototype, "handleOptionDelete", null);
+        return FormOptionsItem;
+    }(React__default["default"].Component));
+    return Item.registerFormItem(tslib.__assign(tslib.__assign({}, config), { strictMode: false, component: FormOptionsItem }));
+}
+function OptionsControl(config) {
+    return function (component) {
+        var renderer = registerOptionsControl(tslib.__assign(tslib.__assign({}, config), { component: component }));
+        return renderer.component;
+    };
+}
+
+exports.OptionsControl = OptionsControl;
+exports.detectProps = detectProps;
+exports.registerOptionsControl = registerOptionsControl;
