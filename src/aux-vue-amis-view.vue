@@ -23,7 +23,7 @@ import axios from 'axios'
 export default {
   name: 'VueAmisView',
   props: {
-    schema: {
+    value: {
       type: Object,
       required: false,
       default: function () {
@@ -76,7 +76,7 @@ export default {
   
     ReactDOM.render(
       renderSchema(
-        this.schema,
+        this.value,
         {
           data: this.amisData,
           onAction: this.onAction || this.handleAction,
