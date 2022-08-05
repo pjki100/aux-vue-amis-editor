@@ -181,6 +181,16 @@ export default {
       type: Function,
       required: false,
       default: () => {}
+    },
+    updateLocation: {
+      type: Function,
+      required: false,
+      default: () => {}
+    },
+    onAction: {
+      type: Function,
+      required: false,
+      default: () => {}
     }
 
   },
