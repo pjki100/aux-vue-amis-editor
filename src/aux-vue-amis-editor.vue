@@ -25,23 +25,32 @@
           <a href="https://aisuda.bce.baidu.com/amis/" target="_blank"> amis文档 </a>
         </div>
     </div>
-    <div v-if="isDesignMode">
+    <div class="main-show" v-if="isDesignMode">
       <amis-editor
-        id="editorName"
+        id="btAmisEditor"
+        ref="btAmisEditor"
         :theme="theme"
-        :preview="preview"
+        :preview="isPreview"
         :isMobile="isMobile"
         @onChange="onChange"
         @onPreview="onPreview"
         @onSave="onSave"
+        @schemaFilter="schemaFilter"
+        @isHiddenProps="isHiddenProps"
+        :ctx="amisCtx"
+        :data="amisData"
         :value="schema"
         :plugins="plugins"
-        :auto-focus="true"
+        :disableBultinPlugin="disableBultinPlugin"
+        :previewProps="previewProps"
+        :iframeUrl="iframeUrl"
+        :autoFocus="autoFocus"
+        :amisEnv="amisEnv"
         :showCustomRenderersPanel="showCustomRenderersPanel"
       />
     </div>
-    <div v-else>
-      <aux-vue-amis-view  :theme="theme"  :schema="schema" :env="env" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
+     <div v-else>
+      <vue-amis-view  :theme="theme"  :schema="schema" :env="amisEnv" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
     </div>
   </div>
 </template>
@@ -51,8 +60,8 @@ import '@fortawesome/fontawesome-free/css/all.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
 import 'amis/lib/helper.css'
- import "amis/lib/themes/cxd.css";
- import "amis/lib/themes/ang.css";
+import "amis/lib/themes/cxd.css";
+import "amis/lib/themes/ang.css";
 import "amis/lib/themes/antd.css";
 import "amis/lib/themes/dark.css";
 import "amis/lib/themes/default.css";
@@ -62,12 +71,10 @@ import { Editor } from "amis-editor";
 import { ReactInVue } from "vuera";
 import 'ant-design-vue/dist/antd.css';
 import { Switch} from 'ant-design-vue';
-import AuxVueAmisView from './aux-vue-amis-view';
 export default {
   name: 'AuxAmisEditor',
   components: {
     AmisEditor: ReactInVue(Editor),
-    AuxVueAmisView,
     ASwitch:Switch
   },
   props:{
@@ -87,12 +94,27 @@ export default {
       require: false,
       default: false,
     },
+    autoFocus: {
+      type: Boolean,
+      require: false,
+      default: true,
+    },
     isTools: {
       type: Boolean,
       require: false,
       default: false,
     },
+    disableBultinPlugin: {
+      type: Boolean,
+      require: false,
+      default: false,
+    },
     theme: {
+      type: String,
+      require: false,
+      default: 'cxd',
+    },
+    iframeUrl: {
       type: String,
       require: false,
       default: 'cxd',
@@ -116,25 +138,34 @@ export default {
       },
     },
      // 查看器属性---begin---
-    env: {
+    amisEnv: {
       type: Object,
       required: false,
       default: function () {
         return {}
       }
     },
+    amisCtx: null,
+    amisData: null,
     //中可以设置语言，默认是中文
      locale: {
       type: String,
       required: false,
       default: "zh-CN"
     },
-    updateLocation: {
+    previewProps: {
+      type: Object,
+      required: false,
+      default: function () {
+        return {}
+      }
+    },
+    schemaFilter: {
       type: Function,
       required: false,
       default: () => {}
     },
-    onAction: {
+    isHiddenProps: {
       type: Function,
       required: false,
       default: () => {}
