@@ -39,7 +39,7 @@
         @isHiddenProps="isHiddenProps"
         :ctx="amisCtx"
         :data="amisData"
-        :value="schema"
+        :value="schemaData"
         :plugins="plugins"
         :disableBultinPlugin="disableBultinPlugin"
         :previewProps="previewProps"
@@ -50,7 +50,7 @@
       />
     </div>
      <div v-else>
-      <vue-amis-view  :theme="theme" :amis-data="amisData" :value="schema" :env="amisEnv" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
+      <vue-amis-view  :theme="theme" :amis-data="amisData" :value="schemaData" :env="amisEnv" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
     </div>
   </div>
 </template>
@@ -200,6 +200,7 @@ export default {
         editTheme:'antd',
         isMobile:false,
         preview:false,
+        schemaData:{},
         themes:[
           {label:'antd',value:'antd'},
           {label:'cxd',value:'cxd'},
@@ -213,10 +214,11 @@ export default {
     this.preview = this.isPreview;
     this.editTheme = this.theme;
     this.isMobile = this.isPhone;
+    this.schemaData = this.schema;
   },
   methods: {
     onChange(e) {
-      this.schema = e;
+      this.schemaData = e;
       this.$emit("onChange", e);
     },
     onSave(e) {
