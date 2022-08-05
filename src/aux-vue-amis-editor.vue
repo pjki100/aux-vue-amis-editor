@@ -30,7 +30,7 @@
         id="btAmisEditor"
         ref="btAmisEditor"
         :theme="theme"
-        :preview="isPreview"
+        :preview="preview"
         :isMobile="isMobile"
         @onChange="onChange"
         @onPreview="onPreview"
