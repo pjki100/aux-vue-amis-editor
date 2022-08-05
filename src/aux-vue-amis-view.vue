@@ -38,7 +38,13 @@ export default {
         return {}
       }
     },
-    amisData: null,
+    amisData: {
+      type: Object|Array,
+      required: false,
+      default: function () {
+        return {}
+      }
+    },
     //中可以设置语言，默认是中文
      locale: {
       type: String,
