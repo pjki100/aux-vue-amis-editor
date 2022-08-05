@@ -9,8 +9,7 @@
   "jsdelivr": "src/aux-vue-amis-editor.vue",
   "files": [
     "dist/*",
-    "src/**/*.vue",
-    "vue.config.js"
+    "src/**/*.vue"
   ],
   "sideEffects": false,
   "scripts": {
@@ -19,7 +18,8 @@
     "build": "cross-env NODE_ENV=production rollup --config build/rollup.config.js",
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
-    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife"
+    "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
+    "publish":"git add . && git commit -m '升级' && git push && npm version patch && npm publish"
   },
   "bugs": {
     "url": "https://github.com/pjki100/aux-vue-amis-editor/issues"
