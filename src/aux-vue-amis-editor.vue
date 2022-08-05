@@ -50,7 +50,7 @@
       />
     </div>
      <div v-else>
-      <vue-amis-view  :theme="theme"  :schema="schema" :env="amisEnv" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
+      <vue-amis-view  :theme="theme" :amis-data="amisData" :schema="schema" :env="amisEnv" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
     </div>
   </div>
 </template>

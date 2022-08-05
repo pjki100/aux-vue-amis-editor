@@ -38,6 +38,7 @@ export default {
         return {}
       }
     },
+    amisData: null,
     //中可以设置语言，默认是中文
      locale: {
       type: String,
@@ -71,6 +72,7 @@ export default {
       renderSchema(
         this.schema,
         {
+          data: this.amisData,
           onAction: this.onAction || this.handleAction,
           theme: this.theme,
           locale: 'zh-CN' // props 中可以设置语言，默认是中文
