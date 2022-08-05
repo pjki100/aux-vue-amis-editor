@@ -117,7 +117,6 @@ export default {
     iframeUrl: {
       type: String,
       require: false,
-      default: 'cxd',
     },
     showCustomRenderersPanel: {
       type: Boolean,
