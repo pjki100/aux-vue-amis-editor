@@ -1,6 +1,6 @@
 {
   "name": "aux-vue-amis-editor",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "升级编辑器到最2.1.0支持amis2.x.x 实时编辑预览，在线拖拽开发",
   "main": "src/aux-vue-amis-editor.vue",
   "browser": "src/aux-vue-amis-editor.vue",
@@ -19,7 +19,7 @@
     "build:ssr": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format cjs",
     "build:es": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format es",
     "build:unpkg": "cross-env NODE_ENV=production rollup --config build/rollup.config.js --format iife",
-    "publish":"git add . && git commit -m '升级' && git push && npm version patch && npm publish"
+    "publish": "git add . && git commit -m '升级' && git push && npm version patch && npm publish"
   },
   "bugs": {
     "url": "https://github.com/pjki100/aux-vue-amis-editor/issues"
