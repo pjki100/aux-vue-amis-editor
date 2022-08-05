@@ -13,11 +13,8 @@
           </a-switch>
 
           <a-switch
-            default-checked
             style="display: block"
             v-model="preview"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
           >
             <span slot="checkedChildren">预览</span>
             <span slot="unCheckedChildren">编辑</span>
