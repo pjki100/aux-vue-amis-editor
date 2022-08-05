@@ -9,7 +9,8 @@
   "jsdelivr": "src/aux-vue-amis-editor.vue",
   "files": [
     "dist/*",
-    "src/**/*.vue"
+    "src/**/*.vue",
+    "vue.config.js"
   ],
   "sideEffects": false,
   "scripts": {
