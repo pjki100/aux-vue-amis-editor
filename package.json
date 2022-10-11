@@ -1,6 +1,6 @@
 {
   "name": "aux-vue-amis-editor",
-  "version": "2.1.20",
+  "version": "2.1.21",
   "description": "升级编辑器到最2.1.0支持amis2.x.x 实时编辑预览，在线拖拽开发",
   "main": "src/aux-vue-amis-editor.vue",
   "browser": "src/aux-vue-amis-editor.vue",
