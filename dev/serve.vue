@@ -578,7 +578,7 @@ export default Vue.extend({
   },
   mounted() {
     this.$nextTick((e) => {
-      // console.log(this.$refs)
+      // console.log(this.$refs) 
       // this.$refs.amisEditor.onChange(this.schema)
     })
   },
