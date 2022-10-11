@@ -3,22 +3,23 @@
   <div class="editor-amis">
     <div class="editor-header" v-if="isTools&&isDesignMode">
         <div class="grid-content bg-purple">
+        <el-switch
+        style="display: block;margin-right: 20px;"
+        v-model="isMobile"
+        active-color="#13ce66"
+        inactive-color="#ff4949"
+        active-text="移动端"
+        inactive-text="PC端">
+      </el-switch>
+      <el-switch
+      style="display: block;margin-right: 20px;"
+      v-model="preview"
+      active-color="#13ce66"
+      inactive-color="#ff4949"
+      active-text="预览"
+      inactive-text="编辑">
+    </el-switch>
 
-          <a-switch
-            style="display: block"
-            v-model="isMobile"
-          >
-            <span slot="checkedChildren">移动端</span>
-            <span slot="unCheckedChildren">pc端</span>
-          </a-switch>
-
-          <a-switch
-            style="display: block"
-            v-model="preview"
-          >
-            <span slot="checkedChildren">预览</span>
-            <span slot="unCheckedChildren">编辑</span>
-          </a-switch>
           <a href="https://aisuda.bce.baidu.com/amis/" target="_blank"> amis文档 </a>
         </div>
     </div>
@@ -66,13 +67,13 @@ import "amis-editor/dist/style.css";
 import "amis/sdk/sdk.css";
 import { Editor } from "amis-editor";
 import { ReactInVue } from "vuera";
-import 'ant-design-vue/dist/antd.css';
-import { Switch} from 'ant-design-vue';
+import { Switch } from 'element-ui';
+
 export default {
   name: 'AuxAmisEditor',
   components: {
     AmisEditor: ReactInVue(Editor),
-    ASwitch:Switch
+    ElSwitch:Switch
   },
   props:{
       //编辑器属性 begin-----
@@ -232,15 +233,17 @@ export default {
 <style lang="less">
 
 .editor-amis {
+ 
 }
 .editor-amis > .editor-header {
-  height: 40px;
+  height: 60px;
+  border-bottom: 1px #44ffff solid;
   .grid-content{
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    background: #FFFFFF;
-    padding: 10px;
+    background: #f3f4f6;
+    padding: 20px;
     a,button{
       margin-right:15px;
       font-size:14px;
