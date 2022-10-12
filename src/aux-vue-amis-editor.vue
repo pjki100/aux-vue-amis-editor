@@ -5,21 +5,22 @@
         <div class="grid-content bg-purple">
 
           <a-switch
-            style="display: block"
+            style="display: block;margin-right: 20px;"
             v-model="isMobile"
           >
             <span slot="checkedChildren">移动端</span>
-            <span slot="unCheckedChildren">pc端</span>
+            <span slot="unCheckedChildren">PC端</span>
           </a-switch>
 
           <a-switch
-            style="display: block"
+            style="display: block;margin-right: 20px;"
             v-model="preview"
           >
             <span slot="checkedChildren">预览</span>
             <span slot="unCheckedChildren">编辑</span>
           </a-switch>
-          <a href="https://aisuda.bce.baidu.com/amis/" target="_blank"> amis文档 </a>
+          <a href="https://aisuda.bce.baidu.com/amis/" style="display: block;margin-right: 20px;" target="_blank"> amis文档 </a>
+          <a href="https://aisuda.bce.baidu.com/amis/examples/form/full" style="display: block;margin-right: 20px;" target="_blank"> amis示例 </a>
         </div>
     </div>
     <div class="main-show" v-if="isDesignMode">
@@ -234,13 +235,13 @@ export default {
 .editor-amis {
 }
 .editor-amis > .editor-header {
-  height: 40px;
+  height: 60px;
   .grid-content{
     display: flex;
     justify-content: flex-end;
     align-items: center;
-    background: #FFFFFF;
-    padding: 10px;
+    background: #f3f4f6;
+    padding: 20px;
     a,button{
       margin-right:15px;
       font-size:14px;
