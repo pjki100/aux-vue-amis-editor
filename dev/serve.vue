@@ -587,6 +587,6 @@ export default Vue.extend({
 
 <template>
   <div id="app">
-    <aux-vue-amis-editor :schema="schema"  :amis-data="dictArr" :is-preview="preview" ref="amisEditor" :is-tools="false" :is-phone="false" :is-design-mode="true" />
+    <aux-vue-amis-editor :schema="schema"  :amis-data="dictArr" :is-debug="true" :is-preview="preview" ref="amisEditor" :is-tools="false" :is-phone="false" :is-design-mode="true" />
   </div>
 </template>

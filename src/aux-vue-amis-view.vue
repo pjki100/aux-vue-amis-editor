@@ -51,6 +51,7 @@ export default {
       required: false,
       default: "zh-CN"
     },
+    //开启调试模式
     isDebug: {
       type: Boolean,
       require: false,
