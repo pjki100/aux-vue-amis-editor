@@ -10,7 +10,7 @@ export default Vue.extend({
   data() {
     return {
       dictArr:  {
-    "title": "",
+    "title": "药品订单-dy",
     "date": "2017-10-13"
      },
       preview: false,
@@ -587,6 +587,6 @@ export default Vue.extend({
 
 <template>
   <div id="app">
-    <aux-vue-amis-editor :schema="schema"  :amis-data="dictArr" :is-preview="preview" ref="amisEditor" :is-tools="true" :is-phone="false" :is-design-mode="true" />
+    <aux-vue-amis-editor :schema="schema"  :amis-data="dictArr" :is-preview="preview" ref="amisEditor" :is-tools="false" :is-phone="false" :is-design-mode="true" />
   </div>
 </template>

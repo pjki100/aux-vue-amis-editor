@@ -21,9 +21,9 @@ import * as qs from 'qs'
 import axios from 'axios'
 
 export default {
-  name: 'VueAmisView',
+  name: 'AuxVueAmisView',
   props: {
-    value: {
+    schema: {
       type: Object,
       required: false,
       default: function () {
@@ -31,7 +31,7 @@ export default {
       }
     },
     // 
-    env: {
+    amisEnv: {
       type: Object,
       required: false,
       default: function () {
@@ -51,6 +51,11 @@ export default {
       required: false,
       default: "zh-CN"
     },
+    isDebug: {
+      type: Boolean,
+      require: false,
+      default: true,
+    },
     updateLocation: {
       type: Function,
       required: false,
@@ -64,36 +69,40 @@ export default {
   },
   data() {
     return {
+      env:this.amisEnv,
       theme: 'cxd'
     }
   },
   mounted() {
     //render(schema: Schema, props?: RootRenderProps, options?: RenderOptions, pathPrefix?: string): JSX.Element
     //如果不存在环境配置
-    if(!this.env.fetcher){
+    console.info('schema-view1:',this.schema);
+    console.info('schema-view1:',this.locale);
+    if(!this.env||!this.env.fetcher){
         this.initEnv()
     }
-  
-    ReactDOM.render(
-      renderSchema(
-        this.value,
+    console.info('schema-view2:',this.schema);
+
+  let schemaData = renderSchema(
+        this.schema,
         {
-          data: this.amisData,
-          onAction: this.onAction || this.handleAction,
+          // data: this.amisData,
+          // onAction: this.onAction || this.handleAction,
           theme: this.theme,
           locale: 'zh-CN' // props 中可以设置语言，默认是中文
         },
         this.env
-      ),
+      );
+    ReactDOM.render(
+      schemaData,
       this.$refs.renderBox
     )
   },
 
   methods: {
     initEnv() {
-      window.enableAMISDebug = true
       this.env = {
-        enableAMISDebug: true,
+        enableAMISDebug: this.isDebug,
         session: 'global',
         updateLocation: this.updateLocation || this.updateRoute,
         isCurrentUrl: to => {
@@ -124,14 +133,11 @@ export default {
           config = config || {}
           config.headers = config.headers || {}
           config.withCredentials = true
-
           if (config.cancelExecutor) {
             config.cancelToken = new axios.CancelToken(config.cancelExecutor)
           }
-
           config.headers = headers || {}
           config.method = method
-
           if (method === 'get' && data) {
             config.params = data
           } else if (data && data instanceof FormData) {
@@ -147,9 +153,7 @@ export default {
             // config.headers = config.headers || {};
             config.headers['Content-Type'] = 'application/json'
           }
-
           data && (config.data = data)
-
           return axios(url, config)
         },
         isCancel: e => axios.isCancel(e),

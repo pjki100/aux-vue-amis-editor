@@ -48,7 +48,7 @@
       />
     </div>
      <div v-else>
-      <vue-amis-view  :theme="theme" :amis-data="amisData" :value="schemaData" :env="amisEnv" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
+      <aux-vue-amis-view  :theme="theme" :amis-data="amisData" :is-debug="isDebug" :schema="schema" :amisEnv="amisEnv" :locale="locale" :updateLocation="updateLocation" :onAction="onAction" />
     </div>
   </div>
 </template>
@@ -69,15 +69,23 @@ import { Editor } from "amis-editor";
 import { ReactInVue } from "vuera";
 import 'ant-design-vue/dist/antd.css';
 import { Switch} from 'ant-design-vue';
+import AuxVueAmisView from './aux-vue-amis-view';
 export default {
   name: 'AuxAmisEditor',
   components: {
     AmisEditor: ReactInVue(Editor),
-    ASwitch:Switch
+    ASwitch:Switch,
+    AuxVueAmisView
   },
   props:{
       //编辑器属性 begin-----
       isDesignMode: {
+      type: Boolean,
+      require: false,
+      default: true,
+    },
+       //开启调试模式
+       isDebug: {
       type: Boolean,
       require: false,
       default: true,
@@ -211,6 +219,7 @@ export default {
     this.preview = this.isPreview;
     this.editTheme = this.theme;
     this.isMobile = this.isPhone;
+    console.info('schema-edit:',this.schema);
     this.schemaData = this.schema;
   },
   methods: {
